@@ -114,113 +114,11 @@ async function loginUser(username) {
         closeButton.addEventListener('click', () => {
             modal.classList.remove('show');
             setTimeout(() => modal.remove(), 300);
-            showApiKeyDialog(username);
+            completeLogin(username);
         });
     } else {
-        showApiKeyDialog(username);
-    }
-}
-
-// 添加API密钥输入对话框
-function showApiKeyDialog(username) {
-    const dialog = document.createElement('div');
-    dialog.className = 'api-key-dialog';
-    dialog.innerHTML = `
-        <div class="api-key-content">
-            <h2>请输入您的 API 密钥</h2>
-            <p>您需要输入一个有效的 API 密钥才能使用 AI 咨询功能。</p>
-            <p>如果您还没有 API 密钥，可以前往 <a href="https://api.siliconflow.cn" target="_blank">SiliconFlow</a> 获取。</p>
-            <input type="password" id="apiKeyInput" placeholder="请输入您的 API 密钥" />
-            <div class="button-group">
-                <button id="submitApiKey">确认</button>
-                <button id="skipApiKey">暂不输入</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(dialog);
-
-    // 添加样式
-    const style = document.createElement('style');
-    style.textContent = `
-        .api-key-dialog {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .api-key-content {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 90%;
-        }
-        .api-key-content h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        .api-key-content p {
-            margin-bottom: 10px;
-            color: #666;
-            font-size: 14px;
-        }
-        .api-key-content input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-bottom: 15px;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-        .button-group button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        #submitApiKey {
-            background: #007AFF;
-            color: white;
-        }
-        #skipApiKey {
-            background: #f5f5f5;
-            color: #666;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // 按钮事件
-    const submitButton = dialog.querySelector('#submitApiKey');
-    const skipButton = dialog.querySelector('#skipApiKey');
-    const apiKeyInput = dialog.querySelector('#apiKeyInput');
-
-    submitButton.addEventListener('click', () => {
-        const apiKey = apiKeyInput.value.trim();
-        if (apiKey) {
-            config.API_KEY = apiKey;
-            localStorage.setItem('api_key', apiKey);
-            dialog.remove();
-            completeLogin(username);
-        } else {
-            alert('请输入有效的 API 密钥');
-        }
-    });
-
-    skipButton.addEventListener('click', () => {
-        dialog.remove();
         completeLogin(username);
-    });
+    }
 }
 
 // 完成登录流程的函数
