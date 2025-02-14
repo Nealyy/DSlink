@@ -1,6 +1,6 @@
 // 配置对象
 const config = {
-    API_KEY: '', // 在这里填入你的 API 密钥
+    API_KEY: 'sk-aibppdtsbhpmkmetxgpfydwwsdkyvlslgaojzqtqmfuawgzu', // API密钥
     API_URL: 'https://api.siliconflow.cn/v1/chat/completions',  // API 地址
     AI_ROLE: `你是一名精通心理咨询的专家，拥有 20 年的心理咨询经验。你的任务是帮助一位不太懂心理咨询的打工人，排忧解难，纾解心理问题。你需要：
 1. 以专业、温暖的态度倾听用户的心声
@@ -20,18 +20,6 @@ const config = {
 // 如果存在本地配置，加载它
 if (localStorage.getItem('api_key')) {
     config.API_KEY = localStorage.getItem('api_key');
-}
-
-// 检查是否设置了 API 密钥
-function checkApiKey() {
-    if (!config.API_KEY) {
-        const key = prompt('请输入你的 SiliconFlow API 密钥：');
-        if (key) {
-            config.API_KEY = key;
-            localStorage.setItem('api_key', key);
-        }
-    }
-    return !!config.API_KEY;
 }
 
 // DOM 元素
@@ -100,6 +88,135 @@ function handleLogin() {
 
 // 登录用户
 function loginUser(username) {
+    // 检查是否是情人节（2月14日）
+    const today = new Date();
+    const isValentinesDay = today.getMonth() === 1 && today.getDate() === 14;
+    
+    // 彩蛋功能：当用户名为 Stardust 且是情人节时触发
+    if (username === 'Stardust' && isValentinesDay) {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        `;
+
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: linear-gradient(135deg, #ff6b6b, #ff8787);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease-out, float 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        `;
+
+        // 添加爱心背景
+        const hearts = Array(5).fill().map(() => {
+            const heart = document.createElement('div');
+            heart.style.cssText = `
+                position: absolute;
+                width: 30px;
+                height: 30px;
+                background: rgba(255, 255, 255, 0.1);
+                transform: rotate(45deg);
+                animation: floatHeart ${3 + Math.random() * 2}s ease-in-out infinite;
+                top: ${Math.random() * 100}%;
+                left: ${Math.random() * 100}%;
+            `;
+            heart.innerHTML = '❤️';
+            return heart;
+        });
+
+        hearts.forEach(heart => content.appendChild(heart));
+
+        content.innerHTML += `
+            <div style="position: relative; z-index: 1;">
+                <h2 style="
+                    margin-bottom: 25px;
+                    color: white;
+                    font-size: 2em;
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                    font-weight: bold;
+                ">🌟 情人节快乐！</h2>
+                <p style="
+                    margin-bottom: 30px;
+                    font-size: 1.4em;
+                    color: white;
+                    line-height: 1.5;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                ">最爱你的大喵</p>
+                <button style="
+                    padding: 12px 30px;
+                    background: white;
+                    color: #ff6b6b;
+                    border: none;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-size: 1.1em;
+                    font-weight: bold;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                    transform: translateY(0);
+                " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.15)'"
+                  onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.1)'"
+                >感谢</button>
+            </div>
+        `;
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        // 点击感谢按钮关闭弹窗并继续登录流程
+        const button = content.querySelector('button');
+        button.onclick = () => {
+            modal.style.animation = 'fadeOut 0.3s ease-out';
+            setTimeout(() => {
+                document.body.removeChild(modal);
+                completeLogin(username);
+            }, 300);
+        };
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: scale(1); }
+                to { opacity: 0; transform: scale(0.9); }
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            @keyframes floatHeart {
+                0%, 100% { transform: rotate(45deg) translateY(0); }
+                50% { transform: rotate(45deg) translateY(-15px); }
+            }
+        `;
+        document.head.appendChild(style);
+    } else {
+        completeLogin(username);
+    }
+}
+
+// 完成登录流程的函数
+function completeLogin(username) {
     currentUser = username;
     localStorage.setItem('currentUser', username);
     
@@ -254,11 +371,6 @@ function startNewChat() {
 
 // 处理发送消息
 async function handleSendMessage() {
-    if (!checkApiKey()) {
-        alert('请先设置 API 密钥');
-        return;
-    }
-    
     if (!currentUser) return;
     
     const message = userInput.value.trim();
