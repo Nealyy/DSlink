@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI心理咨询助手</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <h2>欢迎使用AI心理咨询助手</h2>
+            <div class="login-form">
+                <input type="text" id="usernameInput" placeholder="请输入用户名" />
+                <button id="loginButton">进入对话</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主应用界面 -->
+    <div id="appContainer" class="app-container" style="display: none;">
+        <!-- 左侧历史记录 -->
+        <aside class="chat-history">
+            <div class="history-header">
+                <h2>历史对话</h2>
+                <div class="user-controls">
+                    <div class="user-info">
+                        <span id="currentUser" class="current-user"></span>
+                    </div>
+                    <div class="button-group">
+                        <button id="switchUser" class="switch-user-btn">切换用户</button>
+                        <button id="newChat" class="new-chat-btn">新对话</button>
+                    </div>
+                </div>
+            </div>
+            <div class="history-list" id="historyList">
+                <!-- 历史记录将通过JavaScript动态添加 -->
+            </div>
+        </aside>
+
+        <!-- 右侧对话区域 -->
+        <main class="chat-main">
+            <div class="chat-container">
+                <div id="chatMessages" class="chat-messages">
+                    <!-- 消息内容将动态添加 -->
+                </div>
+                <div class="chat-input-container">
+                    <textarea id="userInput" placeholder="输入你想说的话..." rows="1"></textarea>
+                    <button id="sendMessage" class="send-btn">发送</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

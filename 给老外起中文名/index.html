@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文起名网站 - 获取你的专属中文名</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏮 中文起名网站</h1>
+            <p class="subtitle">发现属于你的完美中文名</p>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <input type="text" id="englishName" placeholder="请输入你的英文名" required>
+                <button id="generateBtn" onclick="generateNames()">生成名字</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在为你精心挑选名字...</p>
+            </div>
+
+            <div class="results" id="results">
+                <!-- 结果将通过JavaScript动态插入 -->
+            </div>
+        </main>
+
+        <footer>
+            <p>powered by DeepSeek AI</p>
+        </footer>
+    </div>
+
+    <script src="static/js/main.js"></script>
+</body>
+</html>
