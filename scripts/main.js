@@ -1,9 +1,8 @@
-// 配置
-const API_KEY = 'sk-aibppdtsbhpmkmetxgpfydwwsdkyvlslgaojzqtqmfuawgzu';
-const API_URL = 'https://api.siliconflow.cn/v1/chat/completions';
-
-// AI角色设定
-const AI_ROLE = `你是一名精通心理咨询的专家，拥有 20 年的心理咨询经验。你的任务是帮助一位不太懂心理咨询的打工人，排忧解难，纾解心理问题。你需要：
+// 配置对象
+const config = {
+    API_KEY: '', // 在这里填入你的 API 密钥
+    API_URL: 'https://api.siliconflow.cn/v1/chat/completions',  // API 地址
+    AI_ROLE: `你是一名精通心理咨询的专家，拥有 20 年的心理咨询经验。你的任务是帮助一位不太懂心理咨询的打工人，排忧解难，纾解心理问题。你需要：
 1. 以专业、温暖的态度倾听用户的心声
 2. 运用专业的心理学知识和技巧提供建议
 3. 保持同理心，理解用户的情感需求
@@ -15,7 +14,25 @@ const AI_ROLE = `你是一名精通心理咨询的专家，拥有 20 年的心�
 - 每次回复都要体现专业性和同理心
 - 避免过于简单或敷衍的回答
 - 在合适的时候提供一些实用的心理学知识
-- 保持对话的连贯性和温度`;
+- 保持对话的连贯性和温度`
+};
+
+// 如果存在本地配置，加载它
+if (localStorage.getItem('api_key')) {
+    config.API_KEY = localStorage.getItem('api_key');
+}
+
+// 检查是否设置了 API 密钥
+function checkApiKey() {
+    if (!config.API_KEY) {
+        const key = prompt('请输入你的 SiliconFlow API 密钥：');
+        if (key) {
+            config.API_KEY = key;
+            localStorage.setItem('api_key', key);
+        }
+    }
+    return !!config.API_KEY;
+}
 
 // DOM 元素
 const loginOverlay = document.getElementById('loginOverlay');
@@ -237,6 +254,11 @@ function startNewChat() {
 
 // 处理发送消息
 async function handleSendMessage() {
+    if (!checkApiKey()) {
+        alert('请先设置 API 密钥');
+        return;
+    }
+    
     if (!currentUser) return;
     
     const message = userInput.value.trim();
@@ -294,16 +316,16 @@ async function handleSendMessage() {
 // 调用API获取AI回复
 async function getAIResponse(message) {
     try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(config.API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
+                'Authorization': `Bearer ${config.API_KEY}`
             },
             body: JSON.stringify({
                 model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
                 messages: [
-                    { role: "system", content: AI_ROLE },
+                    { role: "system", content: config.AI_ROLE },
                     ...conversationHistory,
                     { role: "user", content: message }
                 ],
