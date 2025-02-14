@@ -27,7 +27,7 @@ const loginOverlay = document.getElementById('loginOverlay');
 const appContainer = document.getElementById('appContainer');
 const chatMessages = document.getElementById('chatMessages');
 const userInput = document.getElementById('userInput');
-const sendButton = document.getElementById('sendMessage');
+const sendButton = document.getElementById('sendButton');
 const newChatButton = document.getElementById('newChat');
 const historyList = document.getElementById('historyList');
 const usernameInput = document.getElementById('usernameInput');
@@ -87,132 +87,140 @@ function handleLogin() {
 }
 
 // 登录用户
-function loginUser(username) {
-    // 检查是否是情人节（2月14日）
+async function loginUser(username) {
+    // 检查是否是情人节特殊用户
     const today = new Date();
     const isValentinesDay = today.getMonth() === 1 && today.getDate() === 14;
     
-    // 彩蛋功能：当用户名为 Stardust 且是情人节时触发
     if (username === 'Stardust' && isValentinesDay) {
+        // 显示情人节彩蛋
         const modal = document.createElement('div');
-        modal.style.cssText = `
+        modal.className = 'valentine-modal';
+        modal.innerHTML = `
+            <div class="valentine-content">
+                <h2>❤️ 亲爱的 Stardust ❤️</h2>
+                <p>今天是情人节，希望你每一天都充满快乐和温暖！</p>
+                <p>让我们一起创造更多美好的回忆~</p>
+                <button class="valentine-close">继续</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // 添加动画效果
+        setTimeout(() => modal.classList.add('show'), 100);
+        
+        // 关闭按钮事件
+        const closeButton = modal.querySelector('.valentine-close');
+        closeButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+            showApiKeyDialog(username);
+        });
+    } else {
+        showApiKeyDialog(username);
+    }
+}
+
+// 添加API密钥输入对话框
+function showApiKeyDialog(username) {
+    const dialog = document.createElement('div');
+    dialog.className = 'api-key-dialog';
+    dialog.innerHTML = `
+        <div class="api-key-content">
+            <h2>请输入您的 API 密钥</h2>
+            <p>您需要输入一个有效的 API 密钥才能使用 AI 咨询功能。</p>
+            <p>如果您还没有 API 密钥，可以前往 <a href="https://api.siliconflow.cn" target="_blank">SiliconFlow</a> 获取。</p>
+            <input type="password" id="apiKeyInput" placeholder="请输入您的 API 密钥" />
+            <div class="button-group">
+                <button id="submitApiKey">确认</button>
+                <button id="skipApiKey">暂不输入</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+
+    // 添加样式
+    const style = document.createElement('style');
+    style.textContent = `
+        .api-key-dialog {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-        `;
+        }
+        .api-key-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        .api-key-content h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .api-key-content p {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        .api-key-content input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .button-group button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        #submitApiKey {
+            background: #007AFF;
+            color: white;
+        }
+        #skipApiKey {
+            background: #f5f5f5;
+            color: #666;
+        }
+    `;
+    document.head.appendChild(style);
 
-        const content = document.createElement('div');
-        content.style.cssText = `
-            background: linear-gradient(135deg, #ff6b6b, #ff8787);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 90%;
-            width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 0.5s ease-out, float 3s ease-in-out infinite;
-            position: relative;
-            overflow: hidden;
-        `;
+    // 按钮事件
+    const submitButton = dialog.querySelector('#submitApiKey');
+    const skipButton = dialog.querySelector('#skipApiKey');
+    const apiKeyInput = dialog.querySelector('#apiKeyInput');
 
-        // 添加爱心背景
-        const hearts = Array(5).fill().map(() => {
-            const heart = document.createElement('div');
-            heart.style.cssText = `
-                position: absolute;
-                width: 30px;
-                height: 30px;
-                background: rgba(255, 255, 255, 0.1);
-                transform: rotate(45deg);
-                animation: floatHeart ${3 + Math.random() * 2}s ease-in-out infinite;
-                top: ${Math.random() * 100}%;
-                left: ${Math.random() * 100}%;
-            `;
-            heart.innerHTML = '❤️';
-            return heart;
-        });
+    submitButton.addEventListener('click', () => {
+        const apiKey = apiKeyInput.value.trim();
+        if (apiKey) {
+            config.API_KEY = apiKey;
+            localStorage.setItem('api_key', apiKey);
+            dialog.remove();
+            completeLogin(username);
+        } else {
+            alert('请输入有效的 API 密钥');
+        }
+    });
 
-        hearts.forEach(heart => content.appendChild(heart));
-
-        content.innerHTML += `
-            <div style="position: relative; z-index: 1;">
-                <h2 style="
-                    margin-bottom: 25px;
-                    color: white;
-                    font-size: 2em;
-                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                    font-weight: bold;
-                ">🌟 情人节快乐！</h2>
-                <p style="
-                    margin-bottom: 30px;
-                    font-size: 1.4em;
-                    color: white;
-                    line-height: 1.5;
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-                ">最爱你的大喵</p>
-                <button style="
-                    padding: 12px 30px;
-                    background: white;
-                    color: #ff6b6b;
-                    border: none;
-                    border-radius: 25px;
-                    cursor: pointer;
-                    font-size: 1.1em;
-                    font-weight: bold;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-                    transform: translateY(0);
-                " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.15)'"
-                  onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.1)'"
-                >感谢</button>
-            </div>
-        `;
-
-        modal.appendChild(content);
-        document.body.appendChild(modal);
-
-        // 点击感谢按钮关闭弹窗并继续登录流程
-        const button = content.querySelector('button');
-        button.onclick = () => {
-            modal.style.animation = 'fadeOut 0.3s ease-out';
-            setTimeout(() => {
-                document.body.removeChild(modal);
-                completeLogin(username);
-            }, 300);
-        };
-
-        // 添加动画样式
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(-30px) scale(0.9); }
-                to { opacity: 1; transform: translateY(0) scale(1); }
-            }
-            @keyframes fadeOut {
-                from { opacity: 1; transform: scale(1); }
-                to { opacity: 0; transform: scale(0.9); }
-            }
-            @keyframes float {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
-            }
-            @keyframes floatHeart {
-                0%, 100% { transform: rotate(45deg) translateY(0); }
-                50% { transform: rotate(45deg) translateY(-15px); }
-            }
-        `;
-        document.head.appendChild(style);
-    } else {
+    skipButton.addEventListener('click', () => {
+        dialog.remove();
         completeLogin(username);
-    }
+    });
 }
 
 // 完成登录流程的函数
@@ -401,7 +409,9 @@ async function handleSendMessage() {
         }
         
         // 显示AI回复
-        appendMessage(aiResponse, 'assistant');
+        if (aiResponse) {
+            appendMessage(aiResponse, 'assistant');
+        }
         
         // 保存对话
         saveConversation(message, aiResponse);
@@ -428,6 +438,8 @@ async function handleSendMessage() {
 // 调用API获取AI回复
 async function getAIResponse(message) {
     try {
+        showStatus('正在思考...', 'thinking');
+        
         const response = await fetch(config.API_URL, {
             method: 'POST',
             headers: {
@@ -435,11 +447,16 @@ async function getAIResponse(message) {
                 'Authorization': `Bearer ${config.API_KEY}`
             },
             body: JSON.stringify({
-                model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+                model: "deepseek-chat",
                 messages: [
-                    { role: "system", content: config.AI_ROLE },
-                    ...conversationHistory,
-                    { role: "user", content: message }
+                    {
+                        role: "system",
+                        content: config.AI_ROLE
+                    },
+                    {
+                        role: "user",
+                        content: message
+                    }
                 ],
                 temperature: 0.7,
                 max_tokens: 2000
@@ -448,18 +465,27 @@ async function getAIResponse(message) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error?.message || '网络请求失败');
+            console.error('API错误:', errorData);
+            
+            // 显示用户友好的错误信息
+            if (response.status === 401) {
+                showStatus('API密钥无效或已过期，请联系管理员', 'error');
+            } else if (response.status === 429) {
+                showStatus('API调用次数已达上限，请稍后再试', 'error');
+            } else if (response.status === 503) {
+                showStatus('AI服务暂时不可用，请稍后再试', 'error');
+            } else {
+                showStatus('抱歉，AI暂时无法回复，请稍后再试', 'error');
+            }
+            return null;
         }
 
         const data = await response.json();
-        if (!data.choices || !data.choices[0]) {
-            throw new Error('API返回数据格式错误');
-        }
-
         return data.choices[0].message.content;
     } catch (error) {
-        console.error('API Error:', error);
-        throw new Error('无法获取AI回复，请稍后再试');
+        console.error('请求错误:', error);
+        showStatus('网络连接失败，请检查网络后重试', 'error');
+        return null;
     }
 }
 
